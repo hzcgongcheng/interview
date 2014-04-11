@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include "tokener.h"
+#include <iostream>
 
 namespace qh
 {
@@ -56,8 +57,9 @@ namespace qh
         }
     }
 
-    ProxyURLExtractor::ProxyURLExtractor()
+    ProxyURLExtractor::ProxyURLExtractor( )
     {
+
     }
 
     bool ProxyURLExtractor::Initialize( const std::string& param_keys_path )
@@ -100,6 +102,48 @@ namespace qh
     {
 #if 1
         //TODO 请面试者在这里添加自己的代码实现以完成所需功能
+		Tokener token(raw_url);
+        token.skipTo('?');
+        token.next(); //skip one char : '?' 
+        std::string key;
+        while (!token.isEnd()) {
+            key = token.nextString('=');
+			if(key.find('&')!=key.npos)
+			{	
+			    token.skipBackTo('&');				
+				key = token.nextString('=');	
+			}
+            if (keys.find(key) != keys.end()) {
+                const char* curpos = token.getCurReadPos();
+                int nreadable = token.getReadableSize();
+
+                /**
+                * case 1: 
+                *  raw_url="http://www.microsofttranslator.com/bv.aspx?from=&to=zh-chs&a=http://hnujug.com/&xx=yy"
+                *  sub_url="http://hnujug.com/"
+                */
+				if(token.current() == '&')
+				{
+					sub_url = "";
+				    continue;				
+				}					
+                sub_url = token.nextString('&');
+
+                if (sub_url.empty() && nreadable > 0) {
+                    /**
+                    * case 2: 
+                    * raw_url="http://www.microsofttranslator.com/bv.aspx?from=&to=zh-chs&a=http://hnujug.com/"
+                    * sub_url="http://hnujug.com/"
+                    */
+                    assert(curpos);
+                    sub_url.assign(curpos, nreadable);
+                }
+            }
+			token.skipTo('&');
+			token.next();
+
+        }
+
 #else
         //这是一份参考实现，但在特殊情况下工作不能符合预期
         Tokener token(raw_url);
