@@ -2,6 +2,16 @@
 #define QIHOO_INI_PARSER_H_
 
 #include <string>
+#include <map>  
+#include <iostream>
+using namespace std;
+struct section{
+   string name;
+   //unsigned  start;
+   //unsigned  end;
+   map<std::string, std::string> properties;
+   struct section *next;
+};
 
 namespace qh
 {
@@ -37,6 +47,9 @@ namespace qh
         const std::string& Get(const std::string& section, const std::string& key, bool* found);
 
     private:
+		//std::map<std::string, std::string> properties;
+		struct section *section_first;
+		struct section *section_last;
     };
 }
 
