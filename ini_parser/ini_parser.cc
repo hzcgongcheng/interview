@@ -116,8 +116,7 @@ namespace qh
 				{
 					parse_state = StartState;
 					struct section *sect = new struct section;
-					sect->name = substr(ini_data,start_offset,offset-start_offset);
-					
+					sect->name = substr(ini_data,start_offset,offset-start_offset);					
 					sect->next = NULL;
 					if(this->section_first == NULL)
 					{
@@ -148,8 +147,15 @@ namespace qh
 					parse_state = StartState;
 					value = substr(ini_data,start_offset,offset-start_offset);
 					moveblank(value);
-					this->section_last->properties[key] = value;
-				//	printf("%s",this->section_last->properties[key].c_str());
+					if(this->section_first == NULL)
+					{
+						struct section *deft_section = new struct section ;
+						deft_section->name = " ";
+						deft_section->next = NULL;						
+						this->section_first = deft_section;
+						this->section_last = deft_section;
+					}					
+					this->section_last->properties[key] = value;				
 					break;
 				}
 				break;
@@ -176,17 +182,46 @@ namespace qh
 	const string& INIParser::Get(const std::string& key, bool* found)
 	{
 		
-		string *value = new string; 				
-	//	printf("%s",section_first->name.c_str());
-	//	printf("%s",section_first->properties["aa"].c_str());		
+		string *value = new string; 			
 		*value = section_first->properties[key];
-		/*
-	    if(value.data()=="\0")
-			*found = false;
-		else
-			*found = true;
-			*/
-		return *value;	
-		
+		return *value;			
 	}
+	const string& INIParser::Get(const std::string& section, const std::string& key, bool* found)
+	{
+		struct section *sect = section_first;
+		string *value = new string; 
+		while(sect->name!=section&&sect!=NULL)
+			sect=sect->next;
+		if(sect!= NULL)
+		{			
+			*value = sect->properties[key];			
+		}
+		return *value;		
+
+	}
+	 bool INIParser::Parse(const std::string& ini_file_path)
+	 {		
+		FILE *file;
+		if((file=fopen(ini_file_path.c_str(),"r"))==NULL)
+		{
+			cout<<"error:unalbe to open input file"<<endl;
+			return false;
+		}
+		fseek(file,0,2);
+		long i = ftell(file);	
+		char *ini_str = new char[i];
+		fseek(file,0,0);
+		long p = 0;
+		ini_str[p] = fgetc(file);
+		while(ini_str[p]!=EOF)
+		{
+			p++;
+			ini_str[p] = fgetc(file);		
+		}
+		ini_str[p] = '\0';	
+		if(fclose(file)!=0)
+			cout<<"unable to close file"<<endl;
+		this->Parse(ini_str,strlen(ini_str),"\n","=");
+	 }
+
 }

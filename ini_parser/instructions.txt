@@ -1,0 +1,2 @@
+ini_parser题参考了http://blog.csdn.net/bertzhang/article/details/7282825中的部分代码，实现了INI核心解析功能。就时间复杂度而言，parser过程的时间复杂度为o(n),空间复杂度为o(n)。get过程的时间复杂度为
+o(log(2)n)，空间复杂度为o(1);

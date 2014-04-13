@@ -4,12 +4,11 @@
 #include <string>
 #include <map>  
 #include <iostream>
+#include <fstream>
 using namespace std;
 struct section{
-   string name;
-   //unsigned  start;
-   //unsigned  end;
-   map<std::string, std::string> properties;
+   string name; 
+   map<string, string> properties;
    struct section *next;
 };
 
@@ -42,9 +41,9 @@ namespace qh
         //! \param[in] - const std::string & key
         //! \param[in] - bool * found - 输出参数，true表明找到这个key
         //! \return - const std::string& - 返回的具体key对应的value
-        const std::string& Get(const std::string& key, bool* found);
+        const string& Get(const std::string& key, bool* found);
 
-        const std::string& Get(const std::string& section, const std::string& key, bool* found);
+        const string& Get(const std::string& section, const std::string& key, bool* found);
 
     private:
 		//std::map<std::string, std::string> properties;
